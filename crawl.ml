@@ -31,15 +31,70 @@ module PR = Pagerank ;;
    the frontier is empty.
  *)
 
-let crawl (_n : int)
-          (_frontier : WT.LinkSet.set)
-          (_visited : WT.LinkSet.set)
-          (_d : WT.LinkIndex.dict)
+let rec crawl (n : int)
+          (frontier : WT.LinkSet.set)
+          (visited : WT.LinkSet.set)
+          (d : WT.LinkIndex.dict)
         : WT.LinkIndex.dict =
-  (* For the time being, we do no crawling and just return the empty
-     dictionary. To eliminate compiler warnings, we temporarily name
-     the argument variables as anonymous variables.*)
-  WT.LinkIndex.empty ;;
+
+  (* auxiliary function to add values to dictionary from list *)
+  let rec dict_modify (lst : string list) (dct : WT.LinkIndex.dict) 
+        (link : WT.link) : WT.LinkIndex.dict =
+        match lst with 
+        (* if list of words empty, then nothing is added to dictionary *)
+        | [] -> dct
+        (* else, add words starting from head *)
+        | hd :: tl -> 
+          (* update existing list of links *)
+          match WT.LinkIndex.lookup dct hd with 
+          (* if key not in dictionary then create new key-value pair *)
+          | None -> dict_modify tl 
+            (WT.LinkIndex.insert dct hd 
+              (WT.LinkSet.insert WT.LinkSet.empty link)) link
+          (* else update value *)
+          | Some v -> dict_modify tl 
+            (WT.LinkIndex.insert dct hd (WT.LinkSet.insert v link)) link in
+(* 
+  (* auxiliary function to insert a set2 into another set, set1 *)
+  let rec set_insert (set1 : WT.LinkSet.set) (set2 : WT.LinkSet.set)
+        : WT.LinkSet.set =
+        match WT.LinkSet.choose set2 with 
+        | None -> set1
+        | Some (elt, set) -> set_insert (WT.LinkSet.insert set1 elt) set in *)
+
+  (* returns elements in set1 but not in set2 *)
+  let rec anti_union (set1 : WT.LinkSet.set) (set2 : WT.LinkSet.set)
+        : WT.LinkSet.set =
+        match WT.LinkSet.choose set2 with
+        | None -> set1
+        | Some (elt, set) -> 
+          anti_union (WT.LinkSet.remove set1 elt) set in
+
+  (* check if we have already crawled n webpages *)
+  if n = 0 then d else 
+
+    (* choose a page from the frontier *)
+    match (WT.LinkSet.choose frontier) with
+    (* if frontier empty then return the dictionary *)
+    | None -> d
+    | Some (elt, set) ->
+      (* check if page already visited *)
+      if (WT.LinkSet.member visited elt) then crawl n set visited d
+      else 
+        (* add page to visited *)
+        let new_visited = WT.LinkSet.insert visited elt in 
+        (* visit the link *)
+        match (CS.get_page elt) with 
+        (* if you can't access the page, keep searching the rest of the pages *)
+        | None -> crawl n set visited d
+        | Some page -> 
+          (* add page links to frontier *)
+          let temp_frontier = WT.LinkSet.union set page.links in
+          (* remove page links if already visited *)
+          let new_frontier = anti_union temp_frontier visited in
+          (* get the list of words on the page and update dictionary *)
+          let new_d = dict_modify page.words d elt in
+        crawl (n - 1) new_frontier new_visited new_d ;;
 
 let crawler (num_pages_to_search : int) (initial_link : WT.link) =
   crawl num_pages_to_search
