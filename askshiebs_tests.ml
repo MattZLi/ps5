@@ -42,10 +42,24 @@ let crawler_tests () =
    *) 
   let test_gabbi = link_present i "girls" in
 
+  let test_sam = link_present i "sassy" in
+
+  let test_functors = link_present i "roughly" in
+
+  let test_queue = link_present i "queue" in
+
   (* indicate if the tests suceed *)
   if 
     test_gabbi "./simple-html/gabbi.html" && 
-    not (test_gabbi "./simple-html/index.html")
+    not (test_gabbi "./simple-html/index.html") &&
+    test_sam "./simple-html/sam.html" &&
+    not (test_sam "./simple-html/functors.html") &&
+    test_functors "./simple-html/functors.html" &&
+    not (test_functors "./simple-html/piazza.html") && 
+    test_queue "./simple-html/sam.html" &&
+    test_queue "./simple-html/queue.html" &&
+    test_queue "./simple-html/index.html" &&
+    not (test_queue "./simple-html/gabbi.html")
   then 
     Printf.printf "SUCCESS: Crawler tests succeeded!\n"
   else 
