@@ -83,5 +83,5 @@ let minutes_spent_on_crawl () : int = 300 ;;
 let minutes_spent_on_sets () : int = 120 ;;
 
 (* Third part: Testing the performance of the implementations *)
-let minutes_spent_on_performance () : int = failwith "not provided" ;;
+let minutes_spent_on_performance () : int = 360 ;;
 

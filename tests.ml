@@ -15,7 +15,6 @@ open Crawl ;;
 *)
 
 (* indexing time of crawler *)
-
 let rec timer (n: int) (inc: int) (max: int) (pth: string) : unit =
 	let helper n = timer n inc max pth in
 		if n < (max + 1) then
@@ -25,14 +24,17 @@ let rec timer (n: int) (inc: int) (max: int) (pth: string) : unit =
 			helper (n + inc))
 		else ();;
 
+(* test simple-html folder *)
 let simple = 
 	Printf.printf "%s\n" "simple-html";
 	timer 2 1 8 "./simple-html/index.html" ;;
 
+(* test html folder *)
 let html = 
 	Printf.printf "%s\n" "html";
 	timer 5 1 20 "./html/index.html" ;;
 
+(* test wiki folder *)
 let wiki = 
 	Printf.printf "%s\n" "wiki";
 	timer 5 5 100 "./wiki/Europe" ;;

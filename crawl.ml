@@ -54,13 +54,6 @@ let rec crawl (n : int)
           (* else update value *)
           | Some v -> dict_modify tl 
             (WT.LinkIndex.insert dct hd (WT.LinkSet.insert v link)) link in
-(* 
-  (* auxiliary function to insert a set2 into another set, set1 *)
-  let rec set_insert (set1 : WT.LinkSet.set) (set2 : WT.LinkSet.set)
-        : WT.LinkSet.set =
-        match WT.LinkSet.choose set2 with 
-        | None -> set1
-        | Some (elt, set) -> set_insert (WT.LinkSet.insert set1 elt) set in *)
 
   (* returns elements in set1 but not in set2 *)
   let rec anti_union (set1 : WT.LinkSet.set) (set2 : WT.LinkSet.set)

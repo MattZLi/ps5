@@ -495,5 +495,5 @@ let _ = IntDictSet.run_tests();;
 module Make (C : COMPARABLE) : (SET with type elt = C.t) =
   (* Change this line to use the dictionary implementation of sets
      when you are finished. *)
-  (* ListSet (C) *)
-  DictSet (C)
+  ListSet (C)
+  (* DictSet (C) *)
