@@ -185,7 +185,6 @@ module ListSet (C: COMPARABLE) : (SET with type elt = C.t) =
       let f = (fun y e -> y ^ "; " ^ C.string_of_t e) in
       "set([" ^ (List.fold_left f "" s) ^ "])"
 
-
     (* Tests for the ListSet functor -- These are just examples of
     tests, your tests should be a lot more thorough than these. *)
 
@@ -210,7 +209,7 @@ module ListSet (C: COMPARABLE) : (SET with type elt = C.t) =
       List.iter (fun k -> assert(not (member s2 k))) elts;
       ()
 
-    let test_union () =
+    let test_union () = 
       ()
 
     let test_intersect () =
@@ -318,13 +317,13 @@ module DictSet(C : COMPARABLE) : (SET with type elt = C.t) =
        returns
           (f ... (f (f u s1) s2) ... sn)
      *)
-    let fold f s1 s2 = 
+    let fold f u s = 
       let convert f x y _ = f x y in 
-      D.fold (convert f) s1 s2
+      D.fold (convert f) u s
 
     let union (s1: set) (s2: set) : set = D.fold D.insert s1 s2
 
-    let choose (s : set) = 
+    let choose (s : set) : (elt * set) option = 
       match D.choose s with 
       | None -> None
       | Some (k, _, s) -> Some (k, s)
@@ -379,24 +378,77 @@ module DictSet(C : COMPARABLE) : (SET with type elt = C.t) =
       ()
 
     let test_union () =
+      let elts1 = generate_random_list 100 in
+      let s1 = insert_list empty elts1 in
+      let elts2 = generate_random_list 100 in
+      let s2 = insert_list empty elts2 in 
+      let s3 = union s1 s2 in 
+      List.iter (fun k -> assert (member s3 k)) elts1;
+      List.iter (fun k -> assert (member s3 k)) elts2;
       ()
 
-    let test_intersect () =
+    let test_intersect () = 
+      let elts1 = generate_random_list 100 in
+      let s1 = insert_list empty elts1 in
+      let elts2 = generate_random_list 100 in
+      let s2 = insert_list empty elts2 in 
+      let s3 = intersect s1 s2 in
+      List.iter (fun k -> 
+        if List.mem k elts2 then assert (member s3 k)
+        else assert(not (member s3 k))) elts1;
+      List.iter (fun k -> 
+        if List.mem k elts1 then assert (member s3 k)
+        else assert(not (member s3 k))) elts2;
       ()
 
     let test_member () =
+      let elts1 = generate_random_list 100 in
+      let s1 = insert_list empty elts1 in
+      let elts2 = generate_random_list 100 in
+      let s2 = insert_list empty elts2 in 
+      List.iter (fun k -> assert (member s1 k)) elts1;
+      List.iter (fun k -> assert (member s2 k)) elts2;
       ()
 
     let test_choose () =
+      let elts1 = generate_random_list 100 in
+      let s1 = insert_list empty elts1 in
+      let elts2 = generate_random_list 100 in
+      let s2 = insert_list empty elts2 in 
+      match choose s1 with 
+        | None -> assert false 
+        | Some (elt1, tl1) -> assert(not (member tl1 elt1));
+      assert (member s1 elt1);
+      match choose s2 with 
+        | None -> assert false
+        | Some (elt2, tl2) -> assert(not (member tl2 elt2));
+      assert (member s2 elt2);
       ()
 
     let test_fold () =
+      let elt1 = C.gen () in 
+      let elt2 = C.gen_lt elt1 in 
+      let elt3 = C.gen_lt elt2 in
+      let elt4 = C.gen_lt elt3 in
+      let s = insert_list empty [elt1; elt3; elt4; elt2] in
+      assert (fold (fun k r -> if k < r then k else r) elt1 s = elt4);
       ()
 
     let test_is_empty () =
+      let elts1 = generate_random_list 100 in
+      let s1 = insert_list empty elts1 in
+      assert (is_empty empty);
+      assert(not (is_empty s1));
       ()
 
     let test_singleton () =
+      let elts1 = generate_random_list 2 in
+      let elt1 = List.hd elts1 in
+      let s1 = singleton elt1 in
+      assert (member s1 elt1);
+      let elt2 = List.hd (List.tl elts1) in
+      let s2 = singleton elt2 in
+      assert (member s2 elt2);
       ()
 
     let run_tests () =
@@ -409,9 +461,6 @@ module DictSet(C : COMPARABLE) : (SET with type elt = C.t) =
       test_fold () ;
       test_is_empty () ;
       test_singleton () ;
-      ()
-    (* Add your test functions to run_tests *)
-    let run_tests () =
       ()
   end
 
