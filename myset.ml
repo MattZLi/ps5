@@ -430,11 +430,11 @@ module IntListSet = ListSet(IntComparable) ;;
    Uncomment out the lines below when you are ready to test your set
    implementation based on dictionaries. *)
 
-(*
+
 module IntDictSet = DictSet(IntComparable) ;;
 
 let _ = IntDictSet.run_tests();;
- *)
+ 
 
 (*----------------------------------------------------------------------
   Make -- a functor that creates a set module by calling the ListSet

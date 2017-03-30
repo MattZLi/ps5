@@ -7,35 +7,32 @@ Part 3 of the pset: tests performance of the implementations.
 
  *)
 
- open Askshiebs_tests ;;
- open Crawl ;;
+open Askshiebs_tests ;;
+open Crawl ;;
  
- (*----------------------------------------------------------------------
+(*----------------------------------------------------------------------
   Compare times
- *)
+*)
 
-(* initialize both implementations of crawlers *)
+(* indexing time of crawler *)
 
-let list_crawler = 
+let rec timer (n: int) (inc: int) (max: int) (pth: string) : unit =
+	let helper n = timer n inc max pth in
+		if n < (max + 1) then
+			(Printf.printf "n = %d " n;
+				ignore (time_crawler crawler n {host = ""; port = 8080; 
+				path = pth});
+			helper (n + inc))
+		else ();;
 
-let dict_crawler = crawl
+let simple = 
+	Printf.printf "%s\n" "simple-html";
+	timer 2 1 8 "./simple-html/index.html" ;;
 
-(* compare indexing time of crawler *)
+let html = 
+	Printf.printf "%s\n" "html";
+	timer 5 1 20 "./html/index.html" ;;
 
-time_crawler list_crawler 8 simple-html/index
-
-time_crawler dict_crawler 8 simple-html/index
-
-time_crawler list_crawler 20 html/index
-
-time_crawler dict_crawler 20 html/index
-
-time_crawler list_crawler 224 wiki/Europe
-
-time_crawler dict_crawler 224 wiki/Europe
-
-(* compare searching time for each implementation *)
-(* different queries
-using AND and OR *)
-
-
+let wiki = 
+	Printf.printf "%s\n" "wiki";
+	timer 5 5 100 "./wiki/Europe" ;;
